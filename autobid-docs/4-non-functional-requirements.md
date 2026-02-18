@@ -1,41 +1,40 @@
 # Non-Functional Requirements (NFR)
 
-Technical restrictions and quality standards that the system must follow.
+Technical restrictions and quality standards that the system must follow to ensure performance, security, and reliability.
 
 ## Performance and Scalability
 * **NFR-01 (Bid Latency):** The total time between the user's click and the bid confirmation (persistence + cache update) must not exceed **200ms** in 95% of cases.
-* **NFR-02 (Concurrency):** The auction service must support peaks of up to **1,000 simultaneous requests** on the same bid endpoint without generating *race conditions* (two equal winning bids).
-* **NFR-03 (Cache):** Frequently read data (Current Value, Auction Status, Vehicle Data) must be cached in Redis (TTL of 5 seconds for active auctions, long TTL for vehicles).
+* **NFR-02 (Concurrency):** The auction service must support peaks of up to **1,000 simultaneous requests** on the same bid endpoint without generating race conditions.
+* **NFR-03 (Cache):** Frequently read data (Current Value, Auction Status, Vehicle Data) must be cached in Redis with a TTL of 5 seconds for active auctions and a long TTL for static vehicle data.
 
 ## Security and Audit
 * **NFR-04 (Authentication):** All external communication must be protected via **JWT (JSON Web Tokens)**.
-* **NFR-05 (Password):** User passwords must be stored using a strong hash (**BCrypt** or **Argon2**).
-* **NFR-06 (Audit):** Every bid must be recorded in an immutable database (MongoDB) containing: `user_id`, `auction_id`, `amount`, `timestamp_precision_ms`, `ip_address`.
+* **NFR-05 (Password):** User passwords must be stored using a strong cryptographic hash, specifically **BCrypt** or **Argon2**.
+* **NFR-06 (Audit):** Every bid must be recorded in an immutable database (MongoDB) containing user ID, auction ID, amount, millisecond-precision timestamp, and IP address.
 
 ## Technology and Architecture
-* **NFR-07 (Backend):** Java 21 LTS with Spring Boot 3.2+.
-* **NFR-08 (Database):**
-    * **PostgreSQL:** For critical relational data (Users, Wallet, Catalog).
-    * **MongoDB:** For high-volume data and history (Bids, Logs).
-* **NFR-09 (Messaging):** RabbitMQ for asynchronous communication between microservices (e.g., `auction.ended` -> triggers email and accounting).
-* **NFR-10 (Containerization):** All services must have a `Dockerfile` and the local environment must be orchestrated via `docker-compose`.
+* **NFR-07 (Backend):** Developed in **Java 21 LTS** using **Spring Boot 3.2+**.
+* **NFR-08 (Databases):** * **PostgreSQL:** Used for critical relational data such as Users, Wallets, and Catalog.
+    * **MongoDB:** Used for high-volume event logs and bid history.
+* **NFR-09 (Messaging):** **RabbitMQ** for asynchronous communication between microservices (e.g., triggering notifications after an auction ends).
+* **NFR-10 (Containerization):** All services must include a `Dockerfile`, and the local environment must be orchestrated via **Docker Compose**.
 
-## Availability
-* **NFR-11 (Resilience):** If the FIPE service (BrasilAPI) is unavailable, the system cannot crash/freeze. It must allow manual registration or try again later (Pattern: Circuit Breaker).
+## Availability and Resilience
+* **NFR-11 (Resilience):** If external services like the FIPE API (BrasilAPI) are unavailable, the system must remain operational through a **Circuit Breaker** pattern, allowing manual registration or retry mechanisms.
 
-## Gestão de API e Fiabilidade
-* **NFR-12 (Documentação):** Cada microsserviço deve expor o seu contrato de API via **Swagger/OpenAPI 3.0**, acessível através do API Gateway.
-* **NFR-13 (Monitorização):** Os serviços devem implementar endpoints de `/health` (Spring Boot Actuator) para monitorização de estado em tempo real.
-* **NFR-14 (Padronização de Erros):** Todos os serviços devem retornar erros num formato JSON unificado contendo `timestamp`, `status_code`, `message` e `path`.
+## API Management and Reliability
+* **NFR-12 (Documentation):** Each microservice must expose its API contract via **Swagger/OpenAPI 3.0**, accessible through the API Gateway.
+* **NFR-13 (Monitoring):** Services must implement health check endpoints using **Spring Boot Actuator** for real-time monitoring.
+* **NFR-14 (Error Standardization):** All services must return errors in a unified JSON format containing a timestamp, status code, message, and the requested path.
 
-## Performance e Consistência de Dados
-* **NFR-15 (Performance de Leitura):** Endpoints de consulta (`GET`) devem responder em menos de **100ms** em 90% dos casos, utilizando caches locais quando aplicável.
-* **NFR-16 (Consistência Eventual):** A sincronização de dados entre serviços (via RabbitMQ) deve ter um atraso máximo de **2 segundos**.
+## Data Performance and Consistency
+* **NFR-15 (Read Performance):** Query endpoints (`GET`) must respond in less than **100ms** in 90% of cases, utilizing local or distributed caches when applicable.
+* **NFR-16 (Eventual Consistency):** Data synchronization between services via RabbitMQ must have a maximum propagation delay of **2 seconds**.
 
-## Integridade e Segurança Avançada
-* **NFR-17 (Idempotência):** Operações críticas como **Realizar Lance** e **Depósito** devem ser idempotentes para evitar duplicidade em caso de falhas de rede.
-* **NFR-18 (Validação de Input):** Todos os dados de entrada devem ser saneados contra XSS (Cross-Site Scripting) e SQL Injection antes da persistência.
-* **NFR-19 (Processamento de Imagem):** As fotos enviadas (US-03) devem ser redimensionadas e otimizadas automaticamente para reduzir o consumo de largura de banda.
+## Integrity and Advanced Security
+* **NFR-17 (Idempotency):** Critical operations such as **Place Bid** and **Wallet Deposit** must be idempotent to prevent duplicate processing in case of network failures.
+* **NFR-18 (Input Validation):** All incoming data must be sanitized against XSS (Cross-Site Scripting) and SQL Injection before persistence.
+* **NFR-19 (Image Processing):** Uploaded vehicle photos must be automatically resized and optimized to reduce bandwidth consumption.
 
 ---
 
@@ -44,4 +43,4 @@ Technical restrictions and quality standards that the system must follow.
 | Date | Name | Observation |
 | :--- | :--- | :--- |
 | 2026-02-17 | Gemini Pro & Taynara Vitorino | Initial document creation via AI and technical review of requirements. |
-| | | |
+| 2026-02-18 | Taynara Vitorino | Unified documentation to English and refined technical terminology. |
