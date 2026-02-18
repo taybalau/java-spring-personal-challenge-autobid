@@ -36,7 +36,7 @@ jobs:
       REDIS_PORT: 6379
       RABBIT_USER: guest
       RABBIT_PASS: ${{ secrets.RABBIT_PASSWORD }}
-      JWT_SECRET: secret-chave-temporaria-para-ci-pipeline-2026
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
     steps:
       - name: Checkout code
