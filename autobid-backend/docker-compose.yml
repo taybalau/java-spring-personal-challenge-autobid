@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  db-postgres:
+    image: postgres:16
+    container_name: db-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB_IDENTITY}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  db-mongo:
+    image: mongo:7.0
+    container_name: db-mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    volumes:
+      - mongo_data:/data/db
+
+  cache-redis:
+    image: redis:7.2-alpine
+    container_name: cache-redis
+    ports:
+      - "${REDIS_PORT}:6379"
+
+  broker-rabbit:
+    image: rabbitmq:3.12-management
+    container_name: broker-rabbit
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBIT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBIT_PASS}
+
+volumes:
+  postgres_data:
+  mongo_data:

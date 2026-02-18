@@ -1,0 +1,43 @@
+# Arquivos de Build e Maven
+**/target/
+.mvn/
+mvnw
+mvnw.cmd
+**/HELP.md
+
+# Regras de exceção do Initializr
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS / IntelliJ / VS Code ###
+.idea
+*.iws
+*.iml
+*.ipr
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+.vscode/
+
+### Outras IDEs ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Segurança e Infra
+.env
+postgres_data/
+mongo_data/
+
+# Logs e Temporários
+*.log
+tmp/
